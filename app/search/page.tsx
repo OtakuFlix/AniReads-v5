@@ -14,7 +14,7 @@ import { Checkbox } from "@/components/ui/checkbox"
 import { Slider } from "@/components/ui/slider"
 import { Separator } from "@/components/ui/separator"
 import { Card, CardContent } from "@/components/ui/card"
-import { searchMangaDxManga, type Manga } from "@/lib/mangadx-api"
+import { searchMangaDxManga, getPrimaryEnglishTitle, type Manga } from "@/lib/mangadx-api"
 import { searchKitsuManga, getKitsuPosterImage, type KitsuManga } from "@/lib/kitsu-api"
 import LoadingSpinner from "@/components/loading-spinner"
 import { useDebounce } from "@/hooks/use-debounce"
@@ -137,8 +137,7 @@ export default function SearchPage() {
 
       const enrichedResults = await Promise.all(
         mangadxMangaList.map(async (mdManga) => {
-          const mdTitle =
-            mdManga.attributes.title?.en || mdManga.attributes.title?.[Object.keys(mdManga.attributes.title)[0]] || ""
+          const mdTitle = getPrimaryEnglishTitle(mdManga)
           let kitsuPosterUrl: string | undefined
           let foundKitsuManga: KitsuManga | undefined
 
@@ -540,11 +539,7 @@ export default function SearchPage() {
                   }
                 >
                   {results.map((manga) => {
-                    const mdTitle =
-                      manga.attributes.title?.en ||
-                      manga.attributes.title?.[Object.keys(manga.attributes.title)[0]] ||
-                      "Unknown Title"
-
+                    const mdTitle = getPrimaryEnglishTitle(manga)
                     const posterUrl = manga.kitsuPosterUrl || "/placeholder.svg?height=300&width=225"
 
                     const genres = manga.attributes.tags
@@ -571,6 +566,7 @@ export default function SearchPage() {
                           genres={genres}
                           year={manga.attributes.year || undefined}
                           contentRating={manga.attributes.contentRating}
+                          manga={manga}
                         />
                       )
                     }

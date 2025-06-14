@@ -7,10 +7,12 @@ import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { Plus, Star, Eye, Calendar, Bookmark } from 'lucide-react'
 import QuickAddDialog from '@/components/library/quick-add-dialog'
+import { getPrimaryEnglishTitle } from '@/lib/mangadx-api'
+import { titleToSlug } from '@/lib/slugify'
 
 interface MangaCardProps {
   id: string
-  title: string
+  title?: string
   slug?: string
   posterUrl: string
   coverUrl?: string
@@ -22,11 +24,12 @@ interface MangaCardProps {
   showAddButton?: boolean
   className?: string
   genres?: string[]
+  manga?: any // For MangaDx manga object
 }
 
 export default function MangaCard({
   id,
-  title,
+  title: propTitle,
   slug,
   posterUrl,
   coverUrl = '',
@@ -37,12 +40,16 @@ export default function MangaCard({
   contentRating,
   showAddButton = true,
   className = '',
-  genres = []
+  genres = [],
+  manga
 }: MangaCardProps) {
   const [showQuickAdd, setShowQuickAdd] = useState(false)
   const [imageLoaded, setImageLoaded] = useState(false)
 
-  // Always use MangaDx ID for routing
+  // Extract title properly from manga object or use provided title
+  const title = manga ? getPrimaryEnglishTitle(manga) : (propTitle || 'Unknown Title')
+  
+  // Always use MangaDx ID for routing - this ensures consistency
   const linkHref = `/manga/${id}`
 
   const mangaData = {

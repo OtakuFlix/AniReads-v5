@@ -8,4 +8,15 @@ export function slugify(text: string): string {
     .replace(/\s+/g, "-") // Replace spaces with -
     .replace(/[^\w-]+/g, "") // Remove all non-word chars
     .replace(/--+/g, "-") // Replace multiple - with single -
+    .replace(/^-+|-+$/g, "") // Remove leading/trailing -
+}
+
+// Helper function to convert MangaDx title to slug
+export function titleToSlug(title: string): string {
+  return slugify(title)
+}
+
+// Helper function to convert slug back to search term
+export function slugToSearchTerm(slug: string): string {
+  return slug.replace(/-/g, ' ')
 }

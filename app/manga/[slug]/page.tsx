@@ -13,7 +13,7 @@ import {
   getKitsuCoverImage,
   type KitsuManga,
 } from "@/lib/kitsu-api"
-import { getMangaDxChapters, getMangaDxManga, type Chapter } from "@/lib/mangadx-api"
+import { getMangaDxChapters, getMangaDxManga, getPrimaryEnglishTitle, type Chapter } from "@/lib/mangadx-api"
 import LoadingSpinner from "@/components/loading-spinner"
 import { Button } from "@/components/ui/button"
 
@@ -23,31 +23,63 @@ export default function MangaDetailPage() {
   const [kitsuManga, setKitsuManga] = useState<KitsuManga | null>(null)
   const [chapters, setChapters] = useState<Chapter[]>([])
   const [loading, setLoading] = useState(true)
+  const [mangaDxId, setMangaDxId] = useState<string | null>(null)
   const { user } = useAuth()
 
-  // The slug is now always a MangaDx ID
-  const mangaDxId = params.slug as string
+  const slug = params.slug as string
 
   useEffect(() => {
     const fetchMangaDetails = async () => {
       try {
         setLoading(true)
-        console.log("MangaDetailPage: Fetching details for MangaDx ID:", mangaDxId)
+        console.log("MangaDetailPage: Processing slug:", slug)
+
+        // Check if slug is already a MangaDx ID (UUID format)
+        const isUUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(slug)
+        
+        let currentMangaDxId: string
+        
+        if (isUUID) {
+          // Slug is already a MangaDx ID
+          currentMangaDxId = slug
+          console.log("MangaDetailPage: Using slug as MangaDx ID:", currentMangaDxId)
+        } else {
+          // Slug is a title-based slug, need to search for MangaDx ID
+          console.log("MangaDetailPage: Searching for MangaDx ID using slug:", slug)
+          
+          // Convert slug back to searchable title
+          const searchTitle = slug.replace(/-/g, ' ')
+          
+          // Search MangaDx for the manga
+          const searchResponse = await fetch(`/api/proxy/mangadx/manga?title=${encodeURIComponent(searchTitle)}&limit=1&includes[]=cover_art`)
+          const searchData = await searchResponse.json()
+          
+          if (!searchData.data || searchData.data.length === 0) {
+            console.error("MangaDetailPage: No manga found for slug:", slug)
+            setLoading(false)
+            return
+          }
+          
+          currentMangaDxId = searchData.data[0].id
+          console.log("MangaDetailPage: Found MangaDx ID:", currentMangaDxId)
+          
+          // Update URL to use MangaDx ID for consistency
+          router.replace(`/manga/${currentMangaDxId}`, { scroll: false })
+        }
+
+        setMangaDxId(currentMangaDxId)
 
         // Get MangaDx manga details
-        const mangaDxResponse = await getMangaDxManga(mangaDxId)
+        const mangaDxResponse = await getMangaDxManga(currentMangaDxId)
         const mdManga = mangaDxResponse.data
         
         if (!mdManga) {
-          console.error("MangaDetailPage: No MangaDx manga found for ID:", mangaDxId)
+          console.error("MangaDetailPage: No MangaDx manga found for ID:", currentMangaDxId)
           setLoading(false)
           return
         }
 
-        const mdTitle = mdManga.attributes.title?.en || 
-                       Object.values(mdManga.attributes.title)[0] || 
-                       "Unknown Title"
-        
+        const mdTitle = getPrimaryEnglishTitle(mdManga)
         console.log("MangaDetailPage: MangaDx title:", mdTitle)
 
         // Search Kitsu for additional metadata using the MangaDx title
@@ -55,7 +87,7 @@ export default function MangaDetailPage() {
         try {
           const kitsuSearchData = await searchKitsuManga(mdTitle, 1)
           kitsuData = kitsuSearchData.data[0] || null
-          console.log("MangaDetailPage: Kitsu manga found:", kitsuData)
+          console.log("MangaDetailPage: Kitsu manga found:", !!kitsuData)
         } catch (error) {
           console.warn("MangaDetailPage: Could not fetch Kitsu data:", error)
         }
@@ -63,7 +95,7 @@ export default function MangaDetailPage() {
         setKitsuManga(kitsuData)
 
         // Get chapters from MangaDx
-        const chaptersData = await getMangaDxChapters(mangaDxId)
+        const chaptersData = await getMangaDxChapters(currentMangaDxId)
         const sortedChapters = (chaptersData.data || []).sort((a, b) => {
           const aChapter = Number.parseFloat(a.attributes.chapter || "0")
           const bChapter = Number.parseFloat(b.attributes.chapter || "0")
@@ -87,10 +119,10 @@ export default function MangaDetailPage() {
       }
     }
 
-    if (mangaDxId) {
+    if (slug) {
       fetchMangaDetails()
     }
-  }, [mangaDxId])
+  }, [slug, router])
 
   if (loading) {
     return (

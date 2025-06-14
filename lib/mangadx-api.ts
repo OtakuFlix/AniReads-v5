@@ -92,6 +92,27 @@ export interface ChapterAttributes {
   readableAt: string
 }
 
+// Helper function to get primary English title - ALWAYS use title.en first
+export function getPrimaryEnglishTitle(manga: Manga): string {
+  // ALWAYS prioritize the primary English title from title.en
+  if (manga.attributes.title.en) {
+    return manga.attributes.title.en
+  }
+  
+  // If no primary English title, try other languages in order of preference
+  const titleKeys = Object.keys(manga.attributes.title)
+  const preferredOrder = ['en-us', 'ja-ro', 'ja']
+  
+  for (const lang of preferredOrder) {
+    if (manga.attributes.title[lang]) {
+      return manga.attributes.title[lang]
+    }
+  }
+  
+  // Fallback to first available title
+  return Object.values(manga.attributes.title)[0] || 'Unknown Title'
+}
+
 // Helper function to correctly format query parameters for MangaDx API
 function formatMangaDxQueryParams(params: Record<string, any>): string {
   const queryParts: string[] = []
@@ -297,7 +318,7 @@ export async function getMangaDxRecentWithKitsuPosters(limit = 20) {
         
         if (!manga) continue
         
-        const title = Object.values(manga.attributes.title)[0] || 'Unknown Title'
+        const title = getPrimaryEnglishTitle(manga)
         const normalizedTitle = title.toLowerCase().trim()
         
         // Skip if we've already seen this title (case-insensitive check)
@@ -356,7 +377,7 @@ export async function getMangaDxTrendingWithKitsuPosters(limit = 20) {
     // Process each manga to get Kitsu poster
     for (const manga of mangadxResponse.data) {
       try {
-        const title = Object.values(manga.attributes.title)[0] || 'Unknown Title'
+        const title = getPrimaryEnglishTitle(manga)
         const normalizedTitle = title.toLowerCase().trim()
         
         // Skip if we've already seen this title (case-insensitive check)
@@ -408,6 +429,31 @@ export async function findMangaDxIdByTitle(title: string): Promise<string | null
     return null
   } catch (error) {
     console.error('Error finding MangaDx ID by title:', error)
+    return null
+  }
+}
+
+// Helper function to convert slug to MangaDx ID
+export async function slugToMangaDxId(slug: string): Promise<string | null> {
+  // Check if slug is already a MangaDx ID (UUID format)
+  const isUUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(slug)
+  
+  if (isUUID) {
+    return slug
+  }
+  
+  // Convert slug back to searchable title
+  const searchTitle = slug.replace(/-/g, ' ')
+  
+  // Search MangaDx for the manga
+  try {
+    const searchResults = await searchMangaDxManga(searchTitle, 1)
+    if (searchResults.data && searchResults.data.length > 0) {
+      return searchResults.data[0].id
+    }
+    return null
+  } catch (error) {
+    console.error('Error converting slug to MangaDx ID:', error)
     return null
   }
 }
