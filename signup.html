@@ -1,0 +1,333 @@
+.features {
+    flex-direction: column;
+    gap: 15px;
+}
+
+.feature {
+    margin-bottom: 10px;
+}<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<style>
+body {
+font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+background: #000000;
+background-image: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 400"><defs><pattern id="manga" patternUnits="userSpaceOnUse" width="100" height="100"><rect width="100" height="100" fill="%23ffffff" opacity="0.05"/><rect x="10" y="10" width="80" height="20" fill="%23ffffff" opacity="0.08"/><rect x="10" y="35" width="60" height="15" fill="%23ffffff" opacity="0.08"/><rect x="10" y="55" width="70" height="15" fill="%23ffffff" opacity="0.08"/><circle cx="80" cy="25" r="8" fill="%23dc143c" opacity="0.3"/><rect x="10" y="75" width="80" height="20" fill="%23ffffff" opacity="0.08"/></pattern></defs><rect width="400" height="400" fill="url(%23manga)"/></svg>');
+background-size: 200px 200px;
+margin: 0;
+padding: 40px 20px;
+min-height: 100vh;
+display: flex;
+align-items: center;
+justify-content: center;
+}
+
+.container {
+background: rgba(20, 20, 20, 0.95);
+backdrop-filter: blur(10px);
+border-radius: 20px;
+padding: 60px 40px;
+max-width: 500px;
+width: 100%;
+text-align: center;
+box-shadow: 0 20px 60px rgba(220, 20, 60, 0.3);
+border: 1px solid rgba(220, 20, 60, 0.2);
+position: relative;
+overflow: hidden;
+}
+
+.container::before {
+content: '';
+position: absolute;
+top: -50%;
+left: -50%;
+width: 200%;
+height: 200%;
+background: radial-gradient(circle, rgba(220, 20, 60, 0.05) 0%, transparent 70%);
+animation: rotate 20s linear infinite;
+z-index: 0;
+}
+
+@keyframes rotate {
+from { transform: rotate(0deg); }
+to { transform: rotate(360deg); }
+}
+
+.container > * {
+position: relative;
+z-index: 1;
+}
+
+.logo {
+font-size: 2.5rem;
+font-weight: 800;
+margin-bottom: 30px;
+animation: slideDown 0.8s ease-out;
+}
+
+.logo .ani {
+color: #dc143c;
+text-shadow: 0 0 20px rgba(220, 20, 60, 0.5);
+}
+
+.logo .reads {
+color: #ffffff;
+text-shadow: 0 2px 10px rgba(255, 255, 255, 0.3);
+}
+
+.tagline {
+color: #888888;
+font-size: 0.9rem;
+font-weight: 400;
+margin-bottom: 20px;
+font-style: italic;
+animation: fadeIn 1s ease-out 0.3s both;
+}
+
+h2 {
+color: #ffffff;
+font-size: 2.2rem;
+font-weight: 700;
+margin: 0 0 30px 0;
+text-shadow: 0 2px 10px rgba(255, 255, 255, 0.2);
+animation: slideDown 0.8s ease-out 0.2s both;
+}
+
+@keyframes slideDown {
+from {
+    opacity: 0;
+    transform: translateY(-30px);
+}
+to {
+    opacity: 1;
+    transform: translateY(0);
+}
+}
+
+p {
+color: #cccccc;
+font-size: 1.1rem;
+line-height: 1.6;
+margin: 0 0 40px 0;
+animation: fadeIn 1s ease-out 0.5s both;
+}
+
+@keyframes fadeIn {
+from {
+    opacity: 0;
+    transform: translateY(20px);
+}
+to {
+    opacity: 1;
+    transform: translateY(0);
+}
+}
+
+a {
+display: inline-block;
+background: linear-gradient(135deg, #dc143c 0%, #b91c3c 50%, #dc143c 100%);
+color: white;
+text-decoration: none;
+padding: 20px 45px;
+border-radius: 50px;
+font-weight: bold;
+font-size: 1.2rem;
+box-shadow: 0 10px 30px rgba(220, 20, 60, 0.5);
+transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+position: relative;
+overflow: hidden;
+animation: slideUp 1s ease-out 1s both;
+background-size: 200% 100%;
+text-transform: uppercase;
+letter-spacing: 0.5px;
+}
+
+@keyframes slideUp {
+from {
+    opacity: 0;
+    transform: translateY(30px);
+}
+to {
+    opacity: 1;
+    transform: translateY(0);
+}
+}
+
+a::before {
+content: '';
+position: absolute;
+top: 0;
+left: -100%;
+width: 100%;
+height: 100%;
+background: linear-gradient(90deg, transparent, rgba(255,255,255,0.3), transparent);
+transition: left 0.5s;
+}
+
+a:hover {
+transform: translateY(-5px) scale(1.08);
+box-shadow: 0 20px 50px rgba(220, 20, 60, 0.7);
+background-position: 100% 0;
+}
+
+a:hover::before {
+left: 100%;
+}
+
+a:active {
+transform: translateY(-1px) scale(1.02);
+box-shadow: 0 10px 30px rgba(220, 20, 60, 0.5);
+}
+
+.accent-line {
+width: 80px;
+height: 4px;
+background: linear-gradient(90deg, #dc143c, #ff6b6b, #dc143c);
+margin: 25px auto 35px auto;
+border-radius: 2px;
+animation: expandLine 1.2s ease-out 0.9s both;
+box-shadow: 0 0 20px rgba(220, 20, 60, 0.4);
+}
+
+.welcome-text {
+color: #ffffff;
+font-size: 1.3rem;
+font-weight: 600;
+margin-bottom: 15px;
+animation: fadeIn 1s ease-out 0.6s both;
+}
+
+.description {
+color: #aaaaaa;
+font-size: 1rem;
+line-height: 1.7;
+margin-bottom: 35px;
+animation: fadeIn 1s ease-out 0.7s both;
+}
+
+.features {
+display: flex;
+justify-content: space-around;
+margin: 35px 0;
+padding: 20px;
+background: rgba(220, 20, 60, 0.1);
+border-radius: 15px;
+border: 1px solid rgba(220, 20, 60, 0.2);
+animation: slideUp 1s ease-out 1.2s both;
+}
+
+.feature {
+text-align: center;
+flex: 1;
+}
+
+.feature-icon {
+font-size: 1.5rem;
+margin-bottom: 8px;
+animation: bounce 2s ease-in-out infinite;
+}
+
+.feature-icon:nth-child(1) { animation-delay: 0s; }
+.feature-icon:nth-child(2) { animation-delay: 0.3s; }
+.feature-icon:nth-child(3) { animation-delay: 0.6s; }
+
+@keyframes bounce {
+0%, 20%, 50%, 80%, 100% { transform: translateY(0); }
+40% { transform: translateY(-5px); }
+60% { transform: translateY(-3px); }
+}
+
+.feature-text {
+color: #ffffff;
+font-size: 0.8rem;
+font-weight: 600;
+}
+
+.slogan {
+color: #dc143c;
+font-size: 1.1rem;
+font-weight: 700;
+margin-top: 30px;
+text-transform: uppercase;
+letter-spacing: 1px;
+animation: glow 2s ease-in-out infinite alternate;
+}
+
+@keyframes glow {
+from {
+    text-shadow: 0 0 10px rgba(220, 20, 60, 0.8);
+}
+to {
+    text-shadow: 0 0 20px rgba(220, 20, 60, 1), 0 0 30px rgba(220, 20, 60, 0.8);
+}
+}
+
+@keyframes expandLine {
+from {
+    width: 0;
+    opacity: 0;
+}
+to {
+    width: 60px;
+    opacity: 1;
+}
+}
+
+@media (max-width: 600px) {
+.container {
+    margin: 20px;
+    padding: 40px 30px;
+}
+
+h2 {
+    font-size: 1.8rem;
+}
+
+p {
+    font-size: 1rem;
+}
+
+a {
+    padding: 16px 35px;
+    font-size: 1rem;
+}
+}
+</style>
+</head>
+<body>
+<div class="container">
+<div class="logo">
+<span class="ani">Ani</span><span class="reads">Reads</span>
+</div>
+<div class="tagline">"Where Every Page Comes Alive"</div>
+
+<h2>Confirm your signup</h2>
+<div class="accent-line"></div>
+
+<div class="welcome-text">🎌 Welcome to the Ultimate Manga Experience!</div>
+<div class="description">You're about to join thousands of manga enthusiasts in the most immersive reading platform. Get ready to dive into endless worlds of adventure, romance, action, and mystery.</div>
+
+<div class="features">
+<div class="feature">
+    <div class="feature-icon">⚡</div>
+    <div class="feature-text">Lightning Fast</div>
+</div>
+<div class="feature">
+    <div class="feature-icon">🔥</div>
+    <div class="feature-text">Latest Releases</div>
+</div>
+<div class="feature">
+    <div class="feature-icon">💎</div>
+    <div class="feature-text">Premium Quality</div>
+</div>
+</div>
+
+<p>Follow this link to confirm your user:</p>
+<p><a href="{{ .ConfirmationURL }}">🚀 Confirm Your Journey</a></p>
+
+<div class="slogan">Read Beyond Limits</div>
+</div>
+</body>
+</html>
